@@ -38,6 +38,8 @@ export default function LoginScreen() {
       ? 'E-mail ou senha incorretos.'
       : 'Erro ao fazer login. Tente novamente.';
   Alert.alert('Erro', msg);
+} finally {
+  setLoading(false);
 }
   };
 
@@ -46,11 +48,11 @@ export default function LoginScreen() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      {/* Fundo escuro com gradiente */}
+      
       <View style={styles.background} />
 
       <View style={styles.content}>
-        {/* Cristo Redentor */}
+        
         <Image
           source={cristo}
           style={styles.logo}

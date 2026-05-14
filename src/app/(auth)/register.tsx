@@ -30,31 +30,39 @@ export default function RegisterScreen() {
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
-    if (!name || !phone || !email || !password || !confirmPassword) {
-      Alert.alert('Atenção', 'Preencha todos os campos.');
-      return;
-    }
-    if (password !== confirmPassword) {
-      Alert.alert('Atenção', 'As senhas não coincidem.');
-      return;
-    }
-    if (password.length < 6) {
-      Alert.alert('Atenção', 'A senha deve ter pelo menos 6 caracteres.');
-      return;
-    }
-    setLoading(true);
-    try {
-      await signUp({ name, phone, email, password });
-    } catch (error: any) {
-      const msg =
-        error.code === 'auth/email-already-in-use'
-          ? 'Este e-mail já está cadastrado.'
-          : 'Erro ao criar conta. Tente novamente.';
-      Alert.alert('Erro', msg);
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (!name || !phone || !email || !password || !confirmPassword) {
+    Alert.alert('Atenção', 'Preencha todos os campos.');
+    return;
+  }
+  if (password !== confirmPassword) {
+    Alert.alert('Atenção', 'As senhas não coincidem.');
+    return;
+  }
+  if (password.length < 6) {
+    Alert.alert('Atenção', 'A senha deve ter pelo menos 6 caracteres.');
+    return;
+  }
+
+  setLoading(true);
+  try {
+    // 1. Espera o processo de cadastro e criação no Firestore
+    await signUp({ name, phone, email, password });
+    
+    // 2. ADICIONE ESTA LINHA PARA REDIRECIONAR:
+    setTimeout(() => {
+    router.replace('/');
+  }, 500);
+
+  } catch (error: any) {
+    const msg =
+      error.code === 'auth/email-already-in-use'
+        ? 'Este e-mail já está cadastrado.'
+        : 'Erro ao criar conta. Tente novamente.';
+    Alert.alert('Erro', msg);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <KeyboardAvoidingView

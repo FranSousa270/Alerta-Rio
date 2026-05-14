@@ -29,22 +29,30 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
+  (async () => {
+    try {
+      const { status } =
+        await Location.requestForegroundPermissionsAsync();
+
       if (status !== 'granted') {
         setLoading(false);
         return;
       }
 
-      const currentLocation = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
-      });
+      const currentLocation =
+        await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced,
+        });
 
       setLocation(currentLocation);
       checkNearbyZones(currentLocation);
+    } catch (error) {
+      console.log('ERRO LOCATION:', error);
+    } finally {
       setLoading(false);
-    })();
-  }, []);
+    }
+  })();
+}, []);
 
   const checkNearbyZones = (currentLocation: Location.LocationObject) => {
     const userPoint = turf.point([
