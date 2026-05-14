@@ -30,10 +30,20 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-font",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Precisamos da sua localização para alertar sobre áreas de risco próximas.",
+          "locationWhenInUsePermission": "Precisamos da sua localização para alertar sobre áreas de risco próximas."
+        }
+      ]
+      
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "appDir": "src"
     }
   }
 }
