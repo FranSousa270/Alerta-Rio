@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "557692098072",
+    "project_id": "alerta-rio-9a9d3",
+    "storage_bucket": "alerta-rio-9a9d3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:557692098072:android:d286e0e00a486304bd556d",
+        "android_client_info": {
+          "package_name": "com.alertario.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDr_xVkPu3SkbuuJTf1ROIPvD5_XAdlYTY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
