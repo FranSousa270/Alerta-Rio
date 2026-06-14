@@ -1,11 +1,18 @@
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import { useEffect } from 'react';
+import * as NavigationBar from 'expo-navigation-bar';
+import { StatusBar } from 'expo-status-bar';
 
 function RootLayoutNav() {
   const { user, loading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+
+   useEffect(() => {
+    NavigationBar.setBackgroundColorAsync('#000000');
+    NavigationBar.setButtonStyleAsync('light');
+  }, []);
 
   useEffect(() => {
     if (loading) return;
@@ -23,11 +30,17 @@ function RootLayoutNav() {
   }, [user, loading, segments]);
 
   return (
+    <>
+    <StatusBar
+        style="light"
+        backgroundColor="#000000"
+      />
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(auth)" />
       <Stack.Screen name="index" />
       <Stack.Screen name="map" />
     </Stack>
+    </>
   );
 }
 
