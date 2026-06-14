@@ -15,6 +15,7 @@ import {
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
+import { Eye, EyeOff } from 'lucide-react-native';
 
 const { height } = Dimensions.get('window');
 
@@ -28,12 +29,22 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const formatPhoneNumber = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 11);
+    if (digits.length === 0) return '';
+    if (digits.length < 3) return `(${digits}`;
+    if (digits.length < 8) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  };
 
   const handleRegister = async () => {
-  if (!name || !phone || !email || !password || !confirmPassword) {
-    Alert.alert('Atenção', 'Preencha todos os campos.');
-    return;
-  }
+    if (!name || !phone || !email || !password || !confirmPassword) {
+      Alert.alert('Atenção', 'Preencha todos os campos.');
+      return;
+    }
   if (password !== confirmPassword) {
     Alert.alert('Atenção', 'As senhas não coincidem.');
     return;
@@ -67,7 +78,8 @@ export default function RegisterScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 20}
     >
       {/* Mapa só na parte superior */}
       <View style={styles.mapContainer}>
@@ -92,6 +104,7 @@ export default function RegisterScreen() {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        bounces={false}
         style={styles.scrollView}
       >
         <View style={styles.card}>
@@ -110,11 +123,12 @@ export default function RegisterScreen() {
 
             <TextInput
               style={styles.input}
-              placeholder="Numero de telefone"
+              placeholder="(99) 99999-0000"
               placeholderTextColor="rgba(255,255,255,0.7)"
               value={phone}
-              onChangeText={setPhone}
+              onChangeText={(text) => setPhone(formatPhoneNumber(text))}
               keyboardType="phone-pad"
+              maxLength={15}
             />
 
             <TextInput
@@ -128,23 +142,33 @@ export default function RegisterScreen() {
               autoCorrect={false}
             />
 
-            <TextInput
-              style={styles.input}
-              placeholder="Senha"
-              placeholderTextColor="rgba(255,255,255,0.7)"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-            />
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.inputFlex}
+                placeholder="Senha"
+                placeholderTextColor="rgba(255,255,255,0.7)"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+              />
+              <TouchableOpacity onPress={() => setShowPassword(v => !v)} style={styles.eyeBtn}>
+                <Text style={styles.eyeIcon}>{showPassword ? <Eye style={{ color: '#fff' }} /> : <EyeOff style={{ color: '#fff' }} />}</Text>
+              </TouchableOpacity>
+            </View>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Confirme a senha"
-              placeholderTextColor="rgba(255,255,255,0.7)"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry
-            />
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.inputFlex}
+                placeholder="Confirme a senha"
+                placeholderTextColor="rgba(255,255,255,0.7)"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry={!showConfirm}
+              />
+              <TouchableOpacity onPress={() => setShowConfirm(v => !v)} style={styles.eyeBtn}>
+                <Text style={styles.eyeIcon}>{showConfirm ? <Eye style={{ color: '#fff' }} /> : <EyeOff style={{ color: '#fff' }} />}</Text>
+              </TouchableOpacity>
+            </View>
 
             <TouchableOpacity
               style={styles.button}
@@ -229,6 +253,27 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#fff',
     width: '100%',
+  },
+  inputWrapper: {
+    backgroundColor: '#2563EB',
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+  },
+  inputFlex: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 15,
+    color: '#fff',
+  },
+  eyeBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+  },
+  eyeIcon: {
+    fontSize: 18,
   },
 
   button: {

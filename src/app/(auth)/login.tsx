@@ -8,12 +8,14 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   ActivityIndicator,
   Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import cristo from '@/../assets/images/cristo.png';
+import { Eye, EyeOff } from 'lucide-react-native';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -22,6 +24,7 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -30,37 +33,33 @@ export default function LoginScreen() {
     }
     setLoading(true);
     try {
-  await signIn(email, password);
-  router.replace('/');
-} catch (error: any) {
-  const msg =
-    error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password'
-      ? 'E-mail ou senha incorretos.'
-      : 'Erro ao fazer login. Tente novamente.';
-  Alert.alert('Erro', msg);
-} finally {
-  setLoading(false);
-}
+      await signIn(email, password);
+      router.replace('/');
+    } catch (error: any) {
+      const msg =
+        error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password'
+          ? 'E-mail ou senha incorretos.'
+          : 'Erro ao fazer login. Tente novamente.';
+      Alert.alert('Erro', msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      
-      <View style={styles.background} />
-
-      <View style={styles.content}>
-        
-        <Image
-          source={cristo}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+      >
+        <Image source={cristo} style={styles.logo} resizeMode="contain" />
 
         <Text style={styles.title}>Login</Text>
-    
 
         <View style={styles.form}>
           <TextInput
@@ -72,18 +71,26 @@ export default function LoginScreen() {
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
+            returnKeyType="next"
           />
 
-          <TextInput
-            style={styles.input}
-            placeholder="Senha"
-            placeholderTextColor="rgba(255,255,255,0.5)"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
+          <View style={styles.inputWrapper}>
+            <TextInput
+              style={styles.inputFlex}
+              placeholder="Senha"
+              placeholderTextColor="rgba(255,255,255,0.5)"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+              returnKeyType="done"
+              onSubmitEditing={handleLogin}
+            />
+            <TouchableOpacity onPress={() => setShowPassword(v => !v)} style={styles.eyeBtn}>
+              <Text style={styles.eyeIcon}>{showPassword ? <Eye style={{ color: '#fff' }} /> : <EyeOff style={{ color: '#fff' }} />}</Text>
+            </TouchableOpacity>
+          </View>
 
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity onPress={() => router.push('/(auth)/forgotPassword')}>
             <Text style={styles.forgotPassword}>Esqueceu a senha?</Text>
           </TouchableOpacity>
 
@@ -103,37 +110,35 @@ export default function LoginScreen() {
         <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
           <Text style={styles.registerLink}>Crie uma conta nova</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#ffffff' },
-  background: {
-    ...StyleSheet.absoluteFillObject,
+  container: {
+    flex: 1,
     backgroundColor: '#ffffff',
   },
-  content: {
-    flex: 1,
+  scrollContent: {
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 32,
+    paddingVertical: 40,
     gap: 8,
   },
   logo: {
-    width: 280,
-    height: 280,
-    marginTop: -100,
+    width: 240,
+    height: 240,
   },
   title: {
     fontSize: 45,
     fontWeight: '800',
     color: '#2563EB',
     letterSpacing: 1,
-    marginBottom: 25,
+    marginBottom: 16,
   },
-  
   form: {
     width: '100%',
     gap: 12,
@@ -147,6 +152,28 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     fontSize: 15,
     color: '#fff',
+  },
+  inputWrapper: {
+    backgroundColor: '#2563EB',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  inputFlex: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 15,
+    color: '#fff',
+  },
+  eyeBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+  },
+  eyeIcon: {
+    fontSize: 18,
   },
   forgotPassword: {
     color: '#2563EB',

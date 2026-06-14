@@ -710,7 +710,7 @@ export default function MapScreen() {
           {[
             { label: 'Alto risco',  color: '#FF3B30' },
             { label: 'Médio risco', color: '#FF9500' },
-            { label: 'Baixo risco', color: '#FFCC00' },
+            { label: 'Recém reportada', color: '#FFCC00' },
           ].map((item) => (
             <View key={item.label} style={styles.legendItem}>
               <View style={[styles.legendDot, { backgroundColor: item.color }]} />
@@ -971,14 +971,14 @@ const styles = StyleSheet.create({
 
   reportButton: {
     position: 'absolute', bottom: 80, right: 16,
-    backgroundColor: '#1C1C1E', borderRadius: 12,
+    backgroundColor: '#2563EB', borderRadius: 12,
     paddingHorizontal: 14, paddingVertical: 10,
     flexDirection: 'row', alignItems: 'center', gap: 6,
     shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2, shadowRadius: 6, elevation: 5,
   },
   reportButtonActive: { backgroundColor: '#FF3B30' },
-  reportButtonIcon: { fontSize: 16, color: '#FFCC00' },
+  reportButtonIcon: { fontSize: 16, color: '#ff0000', shadowColor: '#fff', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.8, shadowRadius: 4 },
   reportButtonText: { color: '#fff', fontSize: 13, fontWeight: '600' },
 
   drawingHint: {

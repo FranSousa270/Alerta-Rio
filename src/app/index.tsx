@@ -7,66 +7,26 @@ import {
   ScrollView,
   ActivityIndicator,
   Dimensions,
-  Animated,
-  Modal,
-  Pressable,
 } from 'react-native';
 import MapView, { Polygon, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import * as turf from '@turf/turf';
 import { useRouter } from 'expo-router';
 import { dangerZones, DangerZone } from '@/data/zonaDePerigo';
-import { User, Settings, LogOut, ChevronRight, X } from 'lucide-react-native';
-import { useAuth } from '@/context/AuthContext';
+import { User } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
 const PROXIMITY_KM = 10;
-const DRAWER_WIDTH = width * 0.75;
 
 type NearbyZone = DangerZone & { distanceKm: number };
 
 export default function HomeScreen() {
   const router = useRouter();
   const mapRef = useRef<MapView>(null);
-  const { signOut, user } = useAuth();
 
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [nearbyZones, setNearbyZones] = useState<NearbyZone[]>([]);
   const [loading, setLoading] = useState(true);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const drawerAnim = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
-  const overlayAnim = useRef(new Animated.Value(0)).current;
-
-  const openDrawer = () => {
-    setDrawerOpen(true);
-    Animated.parallel([
-      Animated.timing(drawerAnim, {
-        toValue: 0,
-        duration: 280,
-        useNativeDriver: true,
-      }),
-      Animated.timing(overlayAnim, {
-        toValue: 1,
-        duration: 280,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
-
-  const closeDrawer = () => {
-    Animated.parallel([
-      Animated.timing(drawerAnim, {
-        toValue: -DRAWER_WIDTH,
-        duration: 240,
-        useNativeDriver: true,
-      }),
-      Animated.timing(overlayAnim, {
-        toValue: 0,
-        duration: 240,
-        useNativeDriver: true,
-      }),
-    ]).start(() => setDrawerOpen(false));
-  };
 
   useEffect(() => {
   (async () => {
@@ -128,7 +88,7 @@ export default function HomeScreen() {
       {/* Header */}
       
 <View style={styles.header}>
-  <TouchableOpacity style={styles.profileButton} onPress={openDrawer}>
+  <TouchableOpacity style={styles.profileButton}>
     <User size={28} color="#2563EB" />
   </TouchableOpacity>
   <Text style={styles.title}>Alerta Rio</Text>
@@ -231,64 +191,7 @@ export default function HomeScreen() {
         </ScrollView>
       </View>
 
-
-      {/* Menu Lateral */}
-      {drawerOpen && (
-        <Modal transparent visible={drawerOpen} animationType="none" onRequestClose={closeDrawer}>
-          {/* Overlay escuro */}
-          <Animated.View style={[styles.overlay, { opacity: overlayAnim }]}>
-            <Pressable style={StyleSheet.absoluteFill} onPress={closeDrawer} />
-          </Animated.View>
-
-          {/* Drawer */}
-          <Animated.View style={[styles.drawer, { transform: [{ translateX: drawerAnim }] }]}>
-            {/* Cabeçalho do drawer */}
-            <View style={styles.drawerHeader}>
-              <View style={styles.drawerAvatar}>
-                <User size={36} color="#fff" />
-              </View>
-              <View style={styles.drawerUserInfo}>
-                <Text style={styles.drawerUserName}>{user?.displayName ?? 'Meu Perfil'}</Text>
-                <Text style={styles.drawerUserEmail}>{user?.email ?? ''}</Text>
-              </View>
-              <TouchableOpacity onPress={closeDrawer} style={styles.drawerCloseBtn}>
-                <X size={20} color="#8E8E93" />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.drawerDivider} />
-
-            {/* Itens do menu */}
-            <View style={styles.drawerMenu}>
-              <TouchableOpacity style={styles.drawerItem} onPress={() => { closeDrawer(); router.push('/profile'); }}>
-                <View style={styles.drawerItemIcon}>
-                  <User size={20} color="#2563EB" />
-                </View>
-                <Text style={styles.drawerItemText}>Perfil do Usuário</Text>
-                <ChevronRight size={18} color="#C7C7CC" />
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.drawerItem} onPress={() => { closeDrawer(); router.push('/settings'); }}>
-                <View style={styles.drawerItemIcon}>
-                  <Settings size={20} color="#2563EB" />
-                </View>
-                <Text style={styles.drawerItemText}>Configurações</Text>
-                <ChevronRight size={18} color="#C7C7CC" />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.drawerDivider} />
-
-            {/* Logout */}
-            <TouchableOpacity style={[styles.drawerItem, styles.drawerLogout]} onPress={async () => { closeDrawer(); await signOut(); router.replace('/(auth)/login'); }}>
-              <View style={[styles.drawerItemIcon, { backgroundColor: '#FFF0F0' }]}>
-                <LogOut size={20} color="#FF3B30" />
-              </View>
-              <Text style={[styles.drawerItemText, { color: '#FF3B30' }]}>Sair</Text>
-            </TouchableOpacity>
-          </Animated.View>
-        </Modal>
-      )}
+      
     </View>
   );
 }
@@ -384,91 +287,4 @@ headerSpacer: {
   zoneDistance: { fontSize: 13, color: '#8E8E93' },
   zoneTags: { fontSize: 13, color: '#8E8E93', marginLeft: 18 },
   zoneDescription: { fontSize: 13, color: '#3C3C43', marginLeft: 18, lineHeight: 18 },
-
-  // Menu Lateral
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-  },
-  drawer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: DRAWER_WIDTH,
-    height: '100%',
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 4, height: 0 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 16,
-  },
-  drawerHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingTop: 56,
-    paddingBottom: 20,
-    paddingHorizontal: 20,
-    gap: 12,
-    backgroundColor: '#F8FAFF',
-  },
-  drawerAvatar: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: '#2563EB',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  drawerUserInfo: {
-    flex: 1,
-  },
-  drawerUserName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1C1C1E',
-  },
-  drawerUserEmail: {
-    fontSize: 13,
-    color: '#8E8E93',
-    marginTop: 2,
-  },
-  drawerCloseBtn: {
-    padding: 4,
-  },
-  drawerDivider: {
-    height: 1,
-    backgroundColor: '#F2F2F7',
-    marginVertical: 8,
-  },
-  drawerMenu: {
-    paddingHorizontal: 12,
-  },
-  drawerItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    gap: 12,
-    marginBottom: 2,
-  },
-  drawerItemIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
-    backgroundColor: '#EFF4FF',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  drawerItemText: {
-    flex: 1,
-    fontSize: 15,
-    fontWeight: '500',
-    color: '#1C1C1E',
-  },
-  drawerLogout: {
-    marginHorizontal: 12,
-    marginTop: 4,
-  },
 });
